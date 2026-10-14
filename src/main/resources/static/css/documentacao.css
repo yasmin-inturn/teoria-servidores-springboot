@@ -1,0 +1,632 @@
+/*
+ * Estilo da pagina de documentacao.
+ *
+ * Servido pelo proprio Spring Boot: qualquer arquivo em src/main/resources/static
+ * e publicado automaticamente pelo ResourceHttpRequestHandler. Nenhuma CDN -
+ * a pagina precisa abrir mesmo sem internet na hora da apresentacao.
+ */
+
+:root {
+    color-scheme: light dark;
+
+    --fundo: #f6f7f9;
+    --fundo-cartao: #ffffff;
+    --fundo-codigo: #f1f3f5;
+    --fundo-sutil: #eceef1;
+    --borda: #dcdfe4;
+    --borda-forte: #c3c8d0;
+    --texto: #16191d;
+    --texto-suave: #5b636d;
+    --acento: #2f7d4f;
+    --acento-forte: #1f5c39;
+    --acento-fundo: #e6f2ea;
+    --alerta: #9a4b1b;
+    --alerta-fundo: #fcefe4;
+    --sombra: 0 1px 2px rgba(15, 20, 25, .06), 0 8px 24px rgba(15, 20, 25, .05);
+    --raio: 12px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+        --fundo: #0f1215;
+        --fundo-cartao: #171b20;
+        --fundo-codigo: #11151a;
+        --fundo-sutil: #1e242b;
+        --borda: #2a313a;
+        --borda-forte: #3a434e;
+        --texto: #e7eaee;
+        --texto-suave: #a0a9b4;
+        --acento: #5fbd85;
+        --acento-forte: #8bd4a6;
+        --acento-fundo: #14261c;
+        --alerta: #e0a173;
+        --alerta-fundo: #2a1d12;
+        --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
+    }
+}
+
+:root[data-tema="escuro"] {
+    --fundo: #0f1215;
+    --fundo-cartao: #171b20;
+    --fundo-codigo: #11151a;
+    --fundo-sutil: #1e242b;
+    --borda: #2a313a;
+    --borda-forte: #3a434e;
+    --texto: #e7eaee;
+    --texto-suave: #a0a9b4;
+    --acento: #5fbd85;
+    --acento-forte: #8bd4a6;
+    --acento-fundo: #14261c;
+    --alerta: #e0a173;
+    --alerta-fundo: #2a1d12;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+}
+
+.container {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 20px 72px;
+}
+
+/* ---------- cabecalho ---------- */
+
+.capa {
+    border-bottom: 1px solid var(--borda);
+    background: linear-gradient(180deg, var(--acento-fundo), var(--fundo) 85%);
+}
+
+.capa-conteudo {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 40px 20px 32px;
+}
+
+.selo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border: 1px solid var(--borda-forte);
+    border-radius: 999px;
+    background: var(--fundo-cartao);
+    color: var(--texto-suave);
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 18px 0 8px;
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    line-height: 1.15;
+    letter-spacing: -.02em;
+}
+
+.subtitulo {
+    margin: 0;
+    max-width: 68ch;
+    color: var(--texto-suave);
+    font-size: 1.08rem;
+}
+
+.participantes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 26px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.participante {
+    padding: 10px 14px;
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    background: var(--fundo-cartao);
+    box-shadow: var(--sombra);
+}
+
+.participante strong {
+    display: block;
+    font-size: .96rem;
+}
+
+.participante span {
+    color: var(--texto-suave);
+    font-size: .8rem;
+}
+
+.meta-capa {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 22px;
+    color: var(--texto-suave);
+    font-size: .88rem;
+}
+
+/* ---------- barra de status do servidor ---------- */
+
+.runtime {
+    display: grid;
+    /* auto-fit deixa a ultima linha incompleta: por isso os separadores sao
+       bordas das celulas, e nao o fundo aparecendo pelo gap. */
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    margin: 28px 0 0;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    overflow: hidden;
+    background: var(--fundo-cartao);
+}
+
+.runtime div {
+    padding: 12px 14px;
+    border-right: 1px solid var(--borda);
+    border-bottom: 1px solid var(--borda);
+}
+
+.runtime dt {
+    margin: 0 0 2px;
+    color: var(--texto-suave);
+    font-size: .72rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.runtime dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: .92rem;
+    word-break: break-word;
+}
+
+/* ---------- secoes ---------- */
+
+section {
+    margin-top: 56px;
+    scroll-margin-top: 20px;
+}
+
+.rotulo-secao {
+    display: block;
+    color: var(--acento);
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+h2 {
+    margin: 6px 0 4px;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    letter-spacing: -.01em;
+}
+
+.intro-secao {
+    margin: 0 0 24px;
+    max-width: 72ch;
+    color: var(--texto-suave);
+}
+
+h3 {
+    margin: 32px 0 10px;
+    font-size: 1.1rem;
+}
+
+/* ---------- pontos fortes ---------- */
+
+.pontos {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+}
+
+.ponto {
+    position: relative;
+    padding: 20px 20px 20px 22px;
+    border: 1px solid var(--borda);
+    border-left: 3px solid var(--acento);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+    box-shadow: var(--sombra);
+}
+
+.ponto-numero {
+    display: inline-block;
+    margin-bottom: 6px;
+    color: var(--acento);
+    font-family: var(--mono);
+    font-size: .8rem;
+}
+
+.ponto h3 {
+    margin: 0 0 8px;
+    font-size: 1.04rem;
+}
+
+.ponto p {
+    margin: 0;
+    color: var(--texto-suave);
+    font-size: .95rem;
+}
+
+/* ---------- fluxo da requisicao ---------- */
+
+.fluxo {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: etapa;
+}
+
+.fluxo li {
+    position: relative;
+    padding: 0 0 20px 42px;
+    counter-increment: etapa;
+}
+
+.fluxo li::before {
+    content: counter(etapa);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--borda-forte);
+    border-radius: 50%;
+    background: var(--fundo-cartao);
+    color: var(--acento);
+    font-family: var(--mono);
+    font-size: .82rem;
+}
+
+.fluxo li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 13.5px;
+    top: 30px;
+    bottom: 2px;
+    width: 1px;
+    background: var(--borda);
+}
+
+.fluxo strong {
+    display: block;
+    font-size: .98rem;
+}
+
+.fluxo code {
+    font-size: .86rem;
+}
+
+.fluxo p {
+    margin: 2px 0 0;
+    color: var(--texto-suave);
+    font-size: .93rem;
+}
+
+/* ---------- tabelas ---------- */
+
+.rolagem {
+    overflow-x: auto;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+
+th, td {
+    padding: 9px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--borda);
+    white-space: nowrap;
+}
+
+th {
+    background: var(--fundo-sutil);
+    font-size: .76rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+td code {
+    background: none;
+    padding: 0;
+}
+
+.verbo {
+    display: inline-block;
+    min-width: 54px;
+    padding: 1px 8px;
+    border-radius: 5px;
+    background: var(--acento-fundo);
+    color: var(--acento-forte);
+    font-family: var(--mono);
+    font-size: .76rem;
+    text-align: center;
+}
+
+/* ---------- codigo ---------- */
+
+code {
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: var(--fundo-sutil);
+    font-family: var(--mono);
+    font-size: .88em;
+}
+
+pre {
+    margin: 0;
+    padding: 16px 18px;
+    overflow-x: auto;
+    background: var(--fundo-codigo);
+    font-size: .84rem;
+    line-height: 1.55;
+    tab-size: 4;
+}
+
+pre code {
+    padding: 0;
+    background: none;
+    font-size: inherit;
+}
+
+.comando {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+    box-shadow: var(--sombra);
+}
+
+.comando-rotulo {
+    color: var(--texto-suave);
+    font-size: .8rem;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.comando code {
+    flex: 1 1 320px;
+    padding: 8px 12px;
+    background: var(--fundo-codigo);
+    font-size: .95rem;
+}
+
+.arquivo {
+    margin: 0 0 16px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+
+.arquivo-topo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--borda);
+    background: var(--fundo-sutil);
+}
+
+.arquivo-caminho {
+    flex: 1 1 240px;
+    font-family: var(--mono);
+    font-size: .84rem;
+    word-break: break-all;
+}
+
+.arquivo-linhas {
+    color: var(--texto-suave);
+    font-size: .78rem;
+}
+
+.arquivo pre {
+    max-height: 30rem;
+    overflow: auto;
+}
+
+details.arquivo > summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    background: var(--fundo-sutil);
+    font-family: var(--mono);
+    font-size: .84rem;
+    list-style: none;
+}
+
+details.arquivo > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.arquivo > summary::before {
+    content: "▸ ";
+    color: var(--acento);
+}
+
+details.arquivo[open] > summary::before {
+    content: "▾ ";
+}
+
+/* ---------- arvore de arquivos ---------- */
+
+.pasta {
+    margin-bottom: 10px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+    overflow: hidden;
+}
+
+.pasta > summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    background: var(--fundo-sutil);
+    font-family: var(--mono);
+    font-size: .84rem;
+}
+
+.pasta ul {
+    margin: 0;
+    padding: 8px 14px 12px 30px;
+}
+
+.pasta li {
+    font-family: var(--mono);
+    font-size: .84rem;
+}
+
+.pasta a {
+    color: var(--acento-forte);
+    text-decoration: none;
+}
+
+.pasta a:hover {
+    text-decoration: underline;
+}
+
+.pasta .linhas {
+    color: var(--texto-suave);
+    font-size: .76rem;
+}
+
+/* ---------- conclusao ---------- */
+
+.conclusao {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.bloco {
+    padding: 20px;
+    border: 1px solid var(--borda);
+    border-radius: var(--raio);
+    background: var(--fundo-cartao);
+    box-shadow: var(--sombra);
+}
+
+.bloco h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.bloco p {
+    margin: 0;
+    color: var(--texto-suave);
+    font-size: .95rem;
+}
+
+.bloco.destaque {
+    border-left: 3px solid var(--alerta);
+    background: var(--alerta-fundo);
+}
+
+.bloco.destaque p {
+    color: var(--texto);
+}
+
+/* ---------- utilitarios ---------- */
+
+.botao {
+    padding: 6px 12px;
+    border: 1px solid var(--borda-forte);
+    border-radius: 8px;
+    background: var(--fundo-cartao);
+    color: var(--texto);
+    font-family: var(--sans);
+    font-size: .8rem;
+    cursor: pointer;
+}
+
+.botao:hover {
+    border-color: var(--acento);
+    color: var(--acento-forte);
+}
+
+.alternar-tema {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+    box-shadow: var(--sombra);
+}
+
+.indice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 26px;
+    padding: 0;
+    list-style: none;
+}
+
+.indice a {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid var(--borda);
+    border-radius: 999px;
+    background: var(--fundo-cartao);
+    color: var(--texto);
+    font-size: .85rem;
+    text-decoration: none;
+}
+
+.indice a:hover {
+    border-color: var(--acento);
+    color: var(--acento-forte);
+}
+
+footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--borda);
+    color: var(--texto-suave);
+    font-size: .85rem;
+}
+
+footer a {
+    color: var(--acento-forte);
+}
+
+@media (max-width: 640px) {
+    th, td {
+        white-space: normal;
+    }
+}

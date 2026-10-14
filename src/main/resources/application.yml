@@ -1,0 +1,165 @@
+spring:
+  application:
+    name: loja-virtual
+
+  # Banco em memoria: nasce vazio a cada start e e populado pelo CargaInicial.
+  # Trocar para PostgreSQL seria mudar estas 4 linhas + a dependencia no pom.
+  datasource:
+    url: jdbc:h2:mem:loja;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop   # o Hibernate cria as tabelas a partir das @Entity
+    open-in-view: false       # evita consulta preguicosa durante a renderizacao
+    show-sql: false           # mude para true e veja o SQL de cada pedido no console
+    properties:
+      hibernate.format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console       # inspecione as tabelas pelo navegador em dev
+
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+# Endpoints de operacao: saude para o orquestrador, metricas para o time.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,beans,mappings,env,loggers
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    nome: Loja Virtual - servidor de estudo
+    descricao: API REST de e-commerce com Spring Boot
+
+loja:
+  frete:
+    valor-minimo-frete-gratis: 299.00
+    custo-por-kg: 2.50
+    taxa-manuseio: 4.90
+    prazo-base-dias: 3
+  seguranca:
+    # Em producao isto vem de variavel de ambiente (LOJA_SEGURANCA_JWT_SEGREDO).
+    jwt-segredo: "troque-este-segredo-de-estudo-por-32-bytes-ou-mais-em-producao"
+    expiracao-minutos: 120
+    emissor: loja-virtual
+
+logging:
+  level:
+    br.com.loja: INFO
+
+# ---------------------------------------------------------------------------
+# Conteudo da pagina de documentacao servida em GET /
+# Edite daqui para baixo: nomes do grupo, pontos fortes e conclusao.
+# ---------------------------------------------------------------------------
+documentacao:
+  titulo: "Java 25 + Spring Boot 4"
+  tecnologia: "Java 25 (LTS) com Spring Boot 4.0 e Tomcat embarcado"
+  subtitulo: "Servidor HTTP de uma plataforma de e-commerce: API REST, transacoes e seguranca"
+  disciplina: "Teoria de Servidores"
+  instituicao: "[Instituicao]"
+  comando-execucao: "./mvnw spring-boot:run"
+  comando-alternativo: "./mvnw clean package && java -jar target/loja-virtual-0.0.1-SNAPSHOT.jar"
+
+  participantes:
+    - nome: "[Participante 1]"
+      papel: "Catalogo e estoque"
+    - nome: "[Participante 2]"
+      papel: "Pedidos e pagamento"
+    - nome: "[Participante 3]"
+      papel: "Seguranca e JWT"
+    - nome: "[Participante 4]"
+      papel: "Documentacao e testes"
+
+  pontos-fortes:
+    - titulo: "Tipagem forte e injecao de dependencias"
+      texto: >
+        O compilador cobra o contrato antes de o servidor subir: um DTO que mudou
+        de campo quebra o build, nao a requisicao do cliente. Com injecao por
+        construtor, cada classe declara do que precisa e nada mais - o que torna
+        o servico testavel sem subir o Tomcat, passando dublês no construtor.
+        Dinheiro so circula como BigDecimal, nunca double.
+
+    - titulo: "Servidor embarcado e auto-configuracao"
+      texto: >
+        Nao existe servidor de aplicacao para instalar: o Tomcat vem dentro do
+        jar e o metodo main() e o servidor. A auto-configuracao do Spring Boot
+        olha o classpath e liga o que esta la (Tomcat, JPA, Jackson, Security,
+        Actuator) com padroes sensatos - sem XML, e com a opcao de sobrescrever
+        qualquer peca quando a convencao nao serve.
+
+    - titulo: "Transacoes declarativas: atomicidade sem codigo de controle"
+      texto: >
+        Finalizar um pedido baixa estoque, registra pagamento e grava o pedido.
+        Um unico @Transactional no PedidoService garante que isso seja tudo ou
+        nada: se o pagamento for recusado, a excecao sobe e o rollback desfaz a
+        baixa de estoque. Nao existe codigo de compensacao escrito a mao, nem
+        begin/commit espalhado pela aplicacao.
+
+    - titulo: "Seguranca antes do controller"
+      texto: >
+        O Spring Security roda como uma cadeia de filtros na frente do
+        DispatcherServlet. O JWT e validado antes de qualquer regra de negocio e
+        rotas protegidas nunca chegam ao @RestController sem autenticacao. Como o
+        token carrega os perfis, a API fica stateless - da para subir varias
+        instancias atras de um balanceador sem sessao compartilhada.
+
+    - titulo: "Pronto para operar, nao so para rodar"
+      texto: >
+        O Actuator expoe /actuator/health (liveness e readiness para Docker e
+        Kubernetes) e /actuator/metrics com dados reais de JVM, pool de conexoes
+        e requisicoes HTTP. A mesma aplicacao que roda na aula tem os ganchos que
+        um ambiente de producao exige para monitorar e escalar.
+
+  conclusao:
+    dificuldade: >
+      A maior dificuldade inicial nao foi escrever codigo, foi entender o que o
+      framework faz sozinho. Muita coisa acontece por convencao e fica invisivel:
+      quem criou o Tomcat, quem abriu a transacao, por que uma anotacao as vezes
+      simplesmente nao tem efeito. O caso que mais nos custou foi descobrir que
+      @Transactional (e @PreAuthorize) funcionam por PROXY - chamar um metodo
+      anotado de dentro da propria classe nao passa pelo proxy e a anotacao e
+      ignorada em silencio, sem erro nenhum.
+    como-resolvemos: >
+      Passamos a tratar o framework como algo inspecionavel, nao magico: lemos o
+      log de inicializacao, usamos /actuator/beans e /actuator/mappings para ver
+      o que o servidor realmente registrou e ligamos spring.jpa.show-sql para
+      acompanhar o SQL de cada pedido. Esta propria pagina nasceu dai: as rotas
+      que ela lista sao lidas do RequestMappingHandlerMapping em tempo de
+      execucao, entao e o servidor descrevendo a si mesmo.
+    recomendacao: >
+      Para quem for comecar: suba um monolito organizado por dominio (catalogo,
+      carrinho, pedido, pagamento) antes de pensar em microsservicos - a divisao
+      em servicos independentes fica facil depois que as fronteiras ja estao
+      claras no codigo, e evita pagar o custo de rede e de consistencia
+      distribuida sem precisar. E invista cedo em entender a cadeia de filtros, o
+      proxy transacional e o ciclo de vida dos beans: e o que separa usar o
+      Spring de depender da sorte.
+
+  # Arquivos exibidos por inteiro na secao "O codigo do servidor".
+  arquivos-destaque:
+    - "java/br/com/loja/LojaVirtualApplication.java"
+    - "java/br/com/loja/pedido/PedidoService.java"
+    - "java/br/com/loja/pedido/PedidoController.java"
+    - "java/br/com/loja/config/SecurityConfig.java"
+    - "java/br/com/loja/doc/DocumentacaoController.java"
+    - "java/br/com/loja/doc/CodigoFonteService.java"
+    - "resources/application.yml"
+    - "pom.xml"
