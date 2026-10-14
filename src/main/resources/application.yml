@@ -79,14 +79,12 @@ documentacao:
   comando-alternativo: "./mvnw clean package && java -jar target/loja-virtual-0.0.1-SNAPSHOT.jar"
 
   participantes:
-    - nome: "[Participante 1]"
-      papel: "Catalogo e estoque"
-    - nome: "[Participante 2]"
+    - nome: "Yasmin Inturn"
+      papel: "Catalogo, estoque e documentacao"
+    - nome: "Kleyton"
       papel: "Pedidos e pagamento"
-    - nome: "[Participante 3]"
+    - nome: "Maria Isabel Henke"
       papel: "Seguranca e JWT"
-    - nome: "[Participante 4]"
-      papel: "Documentacao e testes"
 
   pontos-fortes:
     - titulo: "Tipagem forte e injecao de dependencias"
