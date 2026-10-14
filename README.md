@@ -1,68 +1,40 @@
 # Atividade Prática de Servidores — Java + Spring Boot
 
-**Disciplina:** Programação Web (UNIVALI) · **Grupo:** Yasmin Inturn, Kleyton, Maria Isabel Henke
+Grupo: Yasmin Inturn, Kleyton, Maria Isabel Henke · Programação Web (UNIVALI)
 
-Servidor HTTP em Java com Spring Boot que responde, na rota principal (`/`), a
-documentação pedida pela atividade: pontos fortes da tecnologia, pré-requisitos
-e setup, o próprio código-fonte do servidor e a conclusão do grupo.
+Servidor HTTP em Java + Spring Boot. A rota `/` serve a documentação da
+atividade (pontos fortes, setup, código-fonte e conclusão); o resto é uma API
+REST mínima de exemplo, só para provar que o servidor funciona de verdade.
 
-## Como rodar
-
-Só é preciso ter um **JDK 17+** instalado (o projeto usa Java 25 LTS). O Maven
-vem pelo wrapper (`mvnw`), que baixa o próprio Maven na primeira execução.
+## Rodar
 
 ```bash
-./mvnw spring-boot:run
+./mvnw spring-boot:run        # Linux/macOS
+mvnw.cmd spring-boot:run      # Windows
 ```
 
-No Windows (PowerShell/cmd), use `mvnw.cmd` em vez de `./mvnw`. Depois abra
-<http://localhost:8080> — a documentação está lá.
+Abra <http://localhost:8080>. Testes: `./mvnw test`.
 
-Testes: `./mvnw test`
+## Rotas
 
-> Se você apagar ou renomear algum arquivo em `src/main/java`, rode
-> `./mvnw clean` antes do próximo `run` — sem isso, o arquivo antigo continua
-> aparecendo na Seção 3, porque a cópia do fonte só adiciona, não remove.
-
-## O que tem no servidor
-
-A rota principal não se limita a um "Hello World": além da página de
-documentação, há uma pequena API REST de exemplo (um catálogo de produtos em
-memória, sem banco de dados) só para provar que o servidor é funcional de
-verdade.
-
-| Método | Rota                | O que faz                          |
-|--------|---------------------|-------------------------------------|
-| GET    | `/`                 | a documentação da atividade         |
-| GET    | `/api/produtos`     | lista os produtos                   |
-| GET    | `/api/produtos/{id}`| busca um produto (404 se não existe)|
-| POST   | `/api/produtos`     | cria um produto (valida o JSON)     |
-| DELETE | `/api/produtos/{id}`| remove um produto                   |
-| GET    | `/actuator/health`  | health check                        |
-
-Exemplo:
-
-```bash
-curl http://localhost:8080/api/produtos
-curl -X POST http://localhost:8080/api/produtos \
-  -H 'Content-Type: application/json' \
-  -d '{"nome":"Webcam","preco":199.90,"estoque":3}'
-```
+| Rota                         | O que faz                 |
+|-------------------------------|----------------------------|
+| `GET /`                       | a documentação             |
+| `GET /api/produtos`           | lista produtos             |
+| `GET /api/produtos/{id}`      | busca um produto           |
+| `POST /api/produtos`          | cria um produto             |
+| `DELETE /api/produtos/{id}`   | remove um produto          |
+| `GET /actuator/health`        | health check                |
 
 ## Estrutura
 
 ```
 src/main/java/br/com/loja/
-├── LojaVirtualApplication.java   main() que sobe o Tomcat embarcado
-├── catalogo/   a API de exemplo (Produto, Service, Controller em memória)
-└── doc/        a página de documentação e a leitura do próprio código
+├── catalogo/   API de exemplo (em memória, sem banco)
+└── doc/        a página de documentação
 ```
 
-A página em `GET /` é renderizada por `templates/documentacao.html`
-(Thymeleaf). Todo o texto editorial (pontos fortes, caso de uso, setup,
-conclusão) vem de `application.yml`, seção `documentacao:` — editar o texto
-não exige recompilar nem mexer no HTML. O código-fonte mostrado na página é
-lido do próprio classpath em tempo de execução (`CodigoFonteService`), e a
-tabela de rotas é lida do `RequestMappingHandlerMapping` do Spring MVC — nada
-disso é copiado à mão, então a página nunca fica desatualizada em relação ao
-código.
+Todo o texto da página (pontos fortes, setup, conclusão) vem de
+`application.yml` → seção `documentacao:`. O código mostrado na Seção 3 é lido
+do próprio projeto em tempo real, não é colado à mão — por isso, se apagar ou
+renomear um arquivo, rode `./mvnw clean` antes do próximo `run`.
