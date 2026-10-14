@@ -2,18 +2,15 @@
 <!--
   Template Thymeleaf da pagina de documentacao (GET /).
 
-  Os dados vem do Model preenchido pelo DocumentacaoController: texto editorial
-  do application.yml, rotas lidas do RequestMappingHandlerMapping em tempo de
-  execucao e o codigo-fonte lido do proprio classpath. Nada aqui e copiado a mao.
-
-  Os acessos usam a forma ${objeto.metodo()} porque os dados sao Java records.
+  Os dados vem do Model preenchido pelo DocumentacaoController: texto
+  editorial do application.yml, rotas lidas do RequestMappingHandlerMapping
+  em tempo de execucao, e o codigo-fonte lido do proprio classpath.
 -->
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${doc.titulo()} + ' - ' + ${doc.disciplina()}">Documentacao do servidor</title>
-    <meta name="description" th:attr="content=${doc.subtitulo()}">
+    <title th:text="${doc.titulo()} + ' - ' + ${participantesEmLinha}">Documentação do servidor</title>
     <link rel="stylesheet" th:href="@{/css/documentacao.css}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#9749;</text></svg>">
 </head>
@@ -21,25 +18,17 @@
 
 <header class="capa">
     <div class="capa-conteudo">
-        <span class="selo" th:text="${doc.disciplina()}">Teoria de Servidores</span>
+        <span class="selo" th:text="${doc.disciplina()}">Programação Web</span>
 
         <h1 th:text="${doc.titulo()}">Java + Spring Boot</h1>
-        <p class="subtitulo" th:text="${doc.subtitulo()}">Servidor HTTP de e-commerce</p>
+        <p class="subtitulo" th:text="${doc.instituicao()}">Instituição</p>
 
         <ul class="participantes">
-            <li class="participante" th:each="participante : ${doc.participantes()}">
-                <strong th:text="${participante.nome()}">Nome</strong>
-                <span th:text="${participante.papel()}">Papel</span>
-            </li>
+            <li class="participante" th:each="participante : ${doc.participantes()}"
+                th:text="${participante.nome()}">Nome</li>
         </ul>
 
-        <div class="meta-capa">
-            <span th:text="'Instituicao: ' + ${doc.instituicao()}">Instituicao</span>
-            <span th:text="'Tecnologia: ' + ${doc.tecnologia()}">Tecnologia</span>
-        </div>
-
-        <!-- Estes numeros sao lidos da JVM e do contexto do Spring agora, no
-             momento em que esta pagina foi gerada. Recarregue e veja mudar. -->
+        <!-- Prova de que o servidor esta vivo agora, nao e so texto estatico. -->
         <dl class="runtime">
             <div>
                 <dt>Servidor</dt>
@@ -50,36 +39,20 @@
                 <dd th:text="${runtime.versaoSpringBoot()}">4.0.8</dd>
             </div>
             <div>
-                <dt>Spring Framework</dt>
-                <dd th:text="${runtime.versaoSpringFramework()}">7.0</dd>
-            </div>
-            <div>
                 <dt>Java</dt>
                 <dd th:text="${runtime.versaoJava()}">25</dd>
             </div>
             <div>
-                <dt>Beans no contexto</dt>
-                <dd th:text="${runtime.beansRegistrados()}">0</dd>
-            </div>
-            <div>
-                <dt>Rotas mapeadas</dt>
-                <dd th:text="${totalRotas}">0</dd>
-            </div>
-            <div>
-                <dt>No ar ha</dt>
+                <dt>No ar há</dt>
                 <dd th:text="${runtime.tempoLigado()}">0h 00min</dd>
-            </div>
-            <div>
-                <dt>Heap em uso</dt>
-                <dd th:text="${runtime.memoriaUsadaMb()} + ' MB'">0 MB</dd>
             </div>
         </dl>
 
         <ul class="indice">
             <li><a href="#secao1">1. Pontos fortes e filosofia</a></li>
-            <li><a href="#secao2">2. Como a requisicao atravessa o servidor</a></li>
-            <li><a href="#secao3">3. O codigo do servidor</a></li>
-            <li><a href="#secao4">4. Conclusao</a></li>
+            <li><a href="#secao2">2. Pré-requisitos e setup</a></li>
+            <li><a href="#secao3">3. O código do servidor</a></li>
+            <li><a href="#secao4">4. Conclusão</a></li>
         </ul>
     </div>
 </header>
@@ -88,179 +61,77 @@
 
     <!-- ===================== SECAO 1 ===================== -->
     <section id="secao1">
-        <span class="rotulo-secao">Secao 1</span>
+        <span class="rotulo-secao">Seção 1</span>
         <h2>Pontos fortes e filosofia</h2>
-        <p class="intro-secao">
-            A filosofia do Spring Boot e "convencao com escape": ele liga sozinho o que esta no
-            classpath e deixa tudo sobrescrevivel. Somado a tipagem forte do Java, isso rende um
-            servidor que fala muito sobre si mesmo - esta pagina e a prova.
-        </p>
 
         <div class="pontos">
             <article class="ponto" th:each="ponto, estado : ${doc.pontosFortes()}">
                 <span class="ponto-numero" th:text="'0' + ${estado.count}">01</span>
-                <h3 th:text="${ponto.titulo()}">Titulo</h3>
+                <h3 th:text="${ponto.titulo()}">Título</h3>
                 <p th:text="${ponto.texto()}">Texto</p>
             </article>
         </div>
+
+        <h3>Exemplo de caso de uso ideal</h3>
+        <p class="texto-corrido" th:text="${doc.casoDeUsoIdeal()}">caso de uso</p>
     </section>
 
     <!-- ===================== SECAO 2 ===================== -->
     <section id="secao2">
-        <span class="rotulo-secao">Secao 2</span>
-        <h2>Como a requisicao atravessa o servidor</h2>
-        <p class="intro-secao">
-            O caminho de um <code>POST /api/pedidos</code> com JSON, da porta TCP ate o commit no
-            banco. Cada etapa e uma peca que da para inspecionar no codigo deste projeto.
-        </p>
+        <span class="rotulo-secao">Seção 2</span>
+        <h2>Pré-requisitos e setup</h2>
 
-        <ol class="fluxo">
-            <li>
-                <strong>Tomcat embarcado aceita a conexao</strong>
-                <p>
-                    O <code>main()</code> subiu um Tomcat dentro do processo. Ele tira uma thread do
-                    pool para esta requisicao, interpreta a linha de status e os cabecalhos HTTP e
-                    entrega um objeto <code>HttpServletRequest</code>.
-                </p>
-            </li>
-            <li>
-                <strong>Cadeia de filtros do Spring Security</strong>
-                <p>
-                    Antes de qualquer codigo de negocio: o filtro do resource server le
-                    <code>Authorization: Bearer ...</code>, confere a assinatura HMAC e a expiracao do
-                    JWT e guarda a identidade no <code>SecurityContext</code>. Token invalido para aqui,
-                    com 401.
-                </p>
-            </li>
-            <li>
-                <strong>DispatcherServlet escolhe o metodo</strong>
-                <p>
-                    O servlet central consulta o <code>RequestMappingHandlerMapping</code> - a mesma
-                    estrutura que a tabela abaixo esta lendo - e descobre que
-                    <code>POST /api/pedidos</code> pertence a <code>PedidoController.criar</code>.
-                </p>
-            </li>
-            <li>
-                <strong>Jackson desserializa, Bean Validation valida</strong>
-                <p>
-                    O JSON vira um <code>PedidoRequest</code> (um record). As anotacoes
-                    <code>@NotEmpty</code>, <code>@Min</code> e <code>@Pattern</code> rodam antes do
-                    corpo do metodo: dado invalido virou HTTP 400 com a lista de campos, sem tocar no
-                    banco.
-                </p>
-            </li>
-            <li>
-                <strong>A transacao abre no proxy do servico</strong>
-                <p>
-                    O <code>PedidoService</code> injetado no controller nao e a classe original, e um
-                    proxy. Ele abre a transacao, chama o metodo real e decide no fim: commit se
-                    retornou, rollback se escapou uma <code>RuntimeException</code>.
-                </p>
-            </li>
-            <li>
-                <strong>Regras de negocio, na ordem</strong>
-                <p>
-                    Baixa de estoque item a item (<code>EstoqueService</code>, que exige transacao
-                    ativa), desconto (<code>DescontoService</code>), frete por regiao de CEP
-                    (<code>FreteService</code>) e pagamento (<code>PagamentoService</code>). Cartao
-                    recusado lanca excecao - e tudo o que veio antes e desfeito.
-                </p>
-            </li>
-            <li>
-                <strong>Hibernate traduz objetos em SQL</strong>
-                <p>
-                    O pedido, os itens e o pagamento sao gravados em cascata. O estoque nem precisa de
-                    UPDATE explicito: a entidade esta gerenciada e o dirty checking gera o SQL no flush.
-                </p>
-            </li>
-            <li>
-                <strong>Commit e resposta</strong>
-                <p>
-                    Com o commit feito, o controller devolve <code>201 Created</code>, o cabecalho
-                    <code>Location</code> do novo pedido e o JSON serializado pelo Jackson. A thread
-                    volta para o pool.
-                </p>
-            </li>
+        <h3>Softwares necessários</h3>
+        <ul class="lista-simples">
+            <li th:each="item : ${doc.prerequisitos()}" th:text="${item}">pré-requisito</li>
+        </ul>
+
+        <h3>Antes de abrir o terminal (qualquer sistema)</h3>
+        <ol class="lista-simples">
+            <li th:each="item : ${doc.setupComum()}" th:text="${item}">passo</li>
         </ol>
 
-        <h3>Rotas que este servidor registrou</h3>
-        <p class="intro-secao">
-            Lista lida do <code>RequestMappingHandlerMapping</code> no momento em que a pagina foi
-            renderizada - nao e uma tabela escrita a mao. Versao completa em JSON:
-            <code>GET /doc/rotas</code>.
+        <h3>Terminal, passo a passo por sistema operacional</h3>
+        <p class="texto-corrido">
+            Só muda de um sistema para o outro como se confirma o JDK instalado, como se
+            configura o <code>JAVA_HOME</code> e qual script do wrapper roda - o resto é igual.
         </p>
-        <div class="rolagem">
-            <table>
-                <thead>
-                <tr>
-                    <th>Metodo</th>
-                    <th>Caminho</th>
-                    <th>Controller</th>
-                    <th>Handler</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="rota : ${rotas}">
-                    <td><span class="verbo" th:text="${rota.verbos()}">GET</span></td>
-                    <td><code th:text="${rota.caminho()}">/api/...</code></td>
-                    <td th:text="${rota.controller()}">Controller</td>
-                    <td><code th:text="${rota.metodo()} + '()'">metodo()</code></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <h3>Experimentos para rodar durante a apresentacao</h3>
         <div class="arquivo">
             <div class="arquivo-topo">
-                <span class="arquivo-caminho">curl</span>
+                <span class="arquivo-caminho">🐧 Linux</span>
                 <button class="botao" type="button" data-copiar>Copiar</button>
             </div>
-            <pre><code># 1. catalogo e publico
-curl -s http://localhost:8080/api/produtos
+            <pre><code th:text="${doc.setupLinuxTexto()}">comandos</code></pre>
+        </div>
 
-# 2. login (devolve o JWT)
-TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"cliente@loja.com","senha":"cliente12345"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
+        <div class="arquivo">
+            <div class="arquivo-topo">
+                <span class="arquivo-caminho"> macOS</span>
+                <button class="botao" type="button" data-copiar>Copiar</button>
+            </div>
+            <pre><code th:text="${doc.setupMacosTexto()}">comandos</code></pre>
+        </div>
 
-# 3. pedido que da certo: estoque baixa, pagamento PIX autorizado, status PAGO
-curl -s -X POST http://localhost:8080/api/pedidos \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"itens":[{"sku":"TEC-MEC-01","quantidade":2}],
-       "cepEntrega":"01310-100","metodoPagamento":"PIX","cupom":"PRIMEIRACOMPRA"}'
-
-# 4. estoque insuficiente: 409 e NADA e gravado (WEB-FHD-03 tem 1 unidade)
-curl -s -X POST http://localhost:8080/api/pedidos \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"itens":[{"sku":"WEB-FHD-03","quantidade":5}],
-       "cepEntrega":"01310-100","metodoPagamento":"PIX"}'
-
-# 5. pagamento recusado: cartao terminado em 0000 derruba a transacao inteira.
-#    Confira /api/produtos depois: o estoque voltou ao que era.
-curl -s -X POST http://localhost:8080/api/pedidos \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"itens":[{"sku":"SSD-1TB-NV","quantidade":1}],"cepEntrega":"69900-000",
-       "metodoPagamento":"CARTAO_CREDITO","numeroCartao":"4111111111110000"}'
-
-# 6. rota de admin com token de cliente: 403
-curl -s -o /dev/null -w '%{http_code}\n' -X DELETE http://localhost:8080/api/produtos/1 \
-  -H "Authorization: Bearer $TOKEN"
-
-# 7. saude do servico, do jeito que o Kubernetes pergunta
-curl -s http://localhost:8080/actuator/health</code></pre>
+        <div class="arquivo">
+            <div class="arquivo-topo">
+                <span class="arquivo-caminho">🪟 Windows (PowerShell ou cmd)</span>
+                <button class="botao" type="button" data-copiar>Copiar</button>
+            </div>
+            <pre><code th:text="${doc.setupWindowsTexto()}">comandos</code></pre>
         </div>
     </section>
 
     <!-- ===================== SECAO 3 ===================== -->
     <section id="secao3">
-        <span class="rotulo-secao">Secao 3</span>
-        <h2>O codigo do servidor</h2>
-        <p class="intro-secao">
-            O codigo abaixo e o deste servidor, lido do proprio classpath em tempo de execucao pelo
-            <code>CodigoFonteService</code>. O <code>maven-resources-plugin</code> copia
-            <code>src/main/java</code> para dentro do artefato durante o build, entao a pagina mostra
-            o fonte real tambem quando roda como <code>java -jar</code>.
+        <span class="rotulo-secao">Seção 3</span>
+        <h2>O código do servidor</h2>
+        <p class="texto-corrido">
+            O código abaixo é o deste servidor, lido do próprio classpath em tempo de execução
+            pelo <code>CodigoFonteService</code> - não é uma cópia colada à mão. O
+            <code>maven-resources-plugin</code> copia <code>src/main/java</code> para dentro do
+            artefato durante o build, então a página mostra o fonte real também quando roda como
+            <code>java -jar</code>.
         </p>
 
         <div class="comando">
@@ -268,46 +139,95 @@ curl -s http://localhost:8080/actuator/health</code></pre>
             <code th:text="${doc.comandoExecucao()}">./mvnw spring-boot:run</code>
             <button class="botao" type="button" data-copiar>Copiar</button>
         </div>
-        <p class="intro-secao" style="margin-top:12px">
-            Alternativa empacotada (gera o jar autossuficiente com o Tomcat dentro):
-            <code th:text="${doc.comandoAlternativo()}">./mvnw clean package &amp;&amp; java -jar target/*.jar</code>.
-            Nenhum servidor externo precisa ser instalado; o build baixa o proprio Maven pelo wrapper
-            (<code>mvnw</code>), entao a maquina so precisa de um JDK 25.
+
+        <h3>Como pensar nisso: um restaurante</h3>
+        <p class="texto-corrido">
+            O projeto é separado em duas pastas (<code>catalogo/</code> e <code>doc/</code>), e
+            dentro de <code>catalogo/</code> cada classe tem um papel só - igual a um
+            restaurante dividido entre salão e cozinha. Pensar assim ajuda a entender uma
+            requisição HTTP antes mesmo de ler o código:
+        </p>
+        <div class="rolagem">
+            <table>
+                <thead>
+                <tr>
+                    <th>No restaurante</th>
+                    <th>No servidor</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>O cliente</td>
+                    <td>quem chama a API (navegador, <code>curl</code>, um app)</td>
+                </tr>
+                <tr>
+                    <td>O pedido feito ao garçom</td>
+                    <td>a requisição HTTP - ex.: <code>GET /api/produtos/3</code></td>
+                </tr>
+                <tr>
+                    <td>O garçom (anota, confere e leva à cozinha)</td>
+                    <td><code>@RestController</code> - o <code>ProdutoController</code></td>
+                </tr>
+                <tr>
+                    <td>A cozinha (onde o prato é de fato preparado)</td>
+                    <td><code>@Service</code> - o <code>ProdutoService</code></td>
+                </tr>
+                <tr>
+                    <td>"Esse prato não está no cardápio"</td>
+                    <td>produto inexistente -&gt; <code>404 Not Found</code></td>
+                </tr>
+                <tr>
+                    <td>Garçom recusa um pedido mal preenchido, sem nem levar à cozinha</td>
+                    <td>Bean Validation rejeita o JSON -&gt; <code>400 Bad Request</code></td>
+                </tr>
+                <tr>
+                    <td>O prato pronto, entregue de volta à mesa</td>
+                    <td>a resposta HTTP em JSON</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="texto-corrido">
+            Na prática: o cliente faz o pedido (<code>GET /api/produtos/3</code>) → o garçom
+            (<code>ProdutoController</code>) confere se o número 3 faz sentido e chama a cozinha
+            (<code>ProdutoService.buscar(3)</code>) → a cozinha encontra o produto (ou não, e aí
+            vira 404) → o prato volta pronto como JSON. Nenhum cliente fala direto com a cozinha,
+            e é exatamente essa separação de responsabilidades (controller ≠ service) que torna o
+            código fácil de testar e de localizar.
         </p>
 
-        <h3>Arquivos principais</h3>
-        <article class="arquivo" th:each="arquivo, estado : ${destaques}">
-            <div class="arquivo-topo">
-                <span class="arquivo-caminho" th:text="${arquivo.caminho()}">caminho</span>
-                <span class="arquivo-linhas" th:text="${arquivo.linhas()} + ' linhas'">0 linhas</span>
-                <a class="botao" th:href="@{'/doc/fonte/' + ${arquivo.caminho()}}" target="_blank">Ver cru</a>
-                <button class="botao" type="button" data-copiar>Copiar</button>
-            </div>
-            <pre><code th:text="${arquivo.conteudo()}">codigo</code></pre>
-        </article>
+        <h3>Rotas registradas</h3>
+        <div class="rolagem">
+            <table>
+                <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>Caminho</th>
+                    <th>Controller</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="rota : ${rotas}">
+                    <td><span class="verbo" th:text="${rota.verbos()}">GET</span></td>
+                    <td><code th:text="${rota.caminho()}">/api/...</code></td>
+                    <td th:text="${rota.controller()}">Controller</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <h3>Projeto completo</h3>
-        <p class="intro-secao">
-            <span th:text="${totalArquivos}">0</span> arquivos e
-            <span th:text="${totalLinhas}">0</span> linhas servidos pelo proprio servidor. Indice em
-            JSON: <code>GET /doc/arquivos</code>.
-        </p>
-        <details class="pasta" th:each="pasta : ${arvore}">
-            <summary th:text="${pasta.key} + '  (' + ${#lists.size(pasta.value)} + ')'">pasta</summary>
-            <ul>
-                <li th:each="arquivo : ${pasta.value}">
-                    <a th:href="@{'/doc/fonte/' + ${arquivo.caminho()}}" target="_blank"
-                       th:text="${arquivo.nome()}">arquivo</a>
-                    <span class="linhas" th:text="' - ' + ${arquivo.linhas()} + ' linhas'">linhas</span>
-                </li>
-            </ul>
+        <h3>Arquivos (<span th:text="${#lists.size(arquivos)}">0</span> arquivos,
+            <span th:text="${totalLinhas}">0</span> linhas)</h3>
+        <details class="arquivo" th:each="arquivo : ${arquivos}">
+            <summary th:text="${arquivo.caminho()} + '  (' + ${arquivo.linhas()} + ' linhas)'">caminho</summary>
+            <pre><code th:text="${arquivo.conteudo()}">código</code></pre>
         </details>
     </section>
 
     <!-- ===================== SECAO 4 ===================== -->
     <section id="secao4">
-        <span class="rotulo-secao">Secao 4</span>
-        <h2>Conclusao</h2>
+        <span class="rotulo-secao">Seção 4</span>
+        <h2>Conclusão</h2>
 
         <div class="conclusao">
             <div class="bloco destaque">
@@ -315,29 +235,18 @@ curl -s http://localhost:8080/actuator/health</code></pre>
                 <p th:text="${doc.conclusao().dificuldade()}">dificuldade</p>
             </div>
             <div class="bloco">
-                <h3>Como contornamos</h3>
-                <p th:text="${doc.conclusao().comoResolvemos()}">como</p>
-            </div>
-            <div class="bloco">
-                <h3>Recomendacao final</h3>
-                <p th:text="${doc.conclusao().recomendacao()}">recomendacao</p>
+                <h3>Recomendação final</h3>
+                <p th:text="${doc.conclusao().recomendacao()}">recomendação</p>
             </div>
         </div>
     </section>
 
     <footer>
+        <p th:text="${doc.titulo()} + ' - ' + ${participantesEmLinha}">rodapé</p>
         <p>
-            <span th:text="${doc.titulo()}">Tecnologia</span> -
-            <span th:text="${participantesEmLinha}">participantes</span>
-        </p>
-        <p>
-            Pagina gerada pelo proprio servidor em
-            <code th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm:ss')}">data</code>.
             Endpoints de apoio:
-            <a th:href="@{/doc/rotas}">/doc/rotas</a>,
-            <a th:href="@{/doc/arquivos}">/doc/arquivos</a>,
-            <a th:href="@{/actuator/health}">/actuator/health</a>,
-            <a th:href="@{/h2-console}">/h2-console</a>.
+            <a th:href="@{/api/produtos}">/api/produtos</a>,
+            <a th:href="@{/actuator/health}">/actuator/health</a>.
         </p>
     </footer>
 </main>

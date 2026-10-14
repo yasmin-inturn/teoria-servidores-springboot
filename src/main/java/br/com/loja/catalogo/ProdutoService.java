@@ -1,77 +1,57 @@
 package br.com.loja.catalogo;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import br.com.loja.catalogo.ProdutoDtos.ProdutoRequest;
-import br.com.loja.common.RecursoNaoEncontradoException;
-import br.com.loja.common.RegraDeNegocioException;
 
 /**
- * Regras do catalogo. A classe nao sabe nada de HTTP: recebe e devolve objetos
- * de dominio. E isso que permite testar as regras sem subir o servidor.
+ * Catálogo de produtos em memória - sem banco de dados.
+ *
+ * O objetivo aqui não é simular um e-commerce completo, e sim mostrar, de
+ * forma pequena e didática, como o Spring organiza uma camada de serviço:
+ * o @Service é um bean gerenciado pelo container, injetado por construtor
+ * no controller, e guarda o estado da aplicação (aqui, um Map em memória).
  */
 @Service
 public class ProdutoService {
 
-    private final ProdutoRepository repositorio;
+    private final Map<Long, Produto> produtos = new ConcurrentHashMap<>();
+    private final AtomicLong proximoId = new AtomicLong(1);
 
-    // Injecao por construtor: o Spring passa a implementacao do repositorio ao
-    // criar o bean. Como o campo e final, o objeto nunca existe pela metade.
-    public ProdutoService(ProdutoRepository repositorio) {
-        this.repositorio = repositorio;
+    public ProdutoService() {
+        criar("Teclado mecânico", new BigDecimal("349.90"), 12);
+        criar("Mouse sem fio", new BigDecimal("129.90"), 30);
+        criar("Monitor 27\" 4K", new BigDecimal("1899.00"), 5);
     }
 
-    @Transactional(readOnly = true)
-    public List<Produto> listar(String categoria) {
-        return (categoria == null || categoria.isBlank())
-                ? repositorio.findByAtivoTrueOrderByNomeAsc()
-                : repositorio.findByCategoriaIgnoreCaseAndAtivoTrueOrderByNomeAsc(categoria);
+    public List<Produto> listar() {
+        return produtos.values().stream()
+                .sorted((a, b) -> a.id().compareTo(b.id()))
+                .toList();
     }
 
-    @Transactional(readOnly = true)
-    public Produto buscarPorId(Long id) {
-        return repositorio.findById(id)
-                .orElseThrow(() -> RecursoNaoEncontradoException.de("Produto", id));
-    }
-
-    @Transactional(readOnly = true)
-    public Produto buscarPorSku(String sku) {
-        return repositorio.findBySku(sku)
-                .orElseThrow(() -> RecursoNaoEncontradoException.de("Produto", sku));
-    }
-
-    @Transactional
-    public Produto criar(ProdutoRequest requisicao) {
-        if (repositorio.existsBySku(requisicao.sku())) {
-            throw new RegraDeNegocioException("Ja existe produto com o SKU " + requisicao.sku());
+    public Produto buscar(Long id) {
+        Produto produto = produtos.get(id);
+        if (produto == null) {
+            throw new ProdutoNaoEncontradoException(id);
         }
-        Produto produto = new Produto(requisicao.sku(), requisicao.nome(), requisicao.descricao(),
-                requisicao.categoria(), requisicao.preco(), requisicao.quantidadeEstoque(), requisicao.pesoKg());
-        return repositorio.save(produto);
-    }
-
-    @Transactional
-    public Produto atualizar(Long id, ProdutoRequest requisicao) {
-        Produto produto = buscarPorId(id);
-        produto.atualizar(requisicao.nome(), requisicao.descricao(), requisicao.categoria(),
-                requisicao.preco(), requisicao.pesoKg());
-        // Nao chamamos save(): dentro da transacao a entidade esta gerenciada pelo
-        // Hibernate, que detecta a mudanca no flush (dirty checking).
         return produto;
     }
 
-    @Transactional
-    public Produto reporEstoque(Long id, int quantidade) {
-        Produto produto = buscarPorId(id);
-        produto.somarEstoque(quantidade);
+    public Produto criar(String nome, BigDecimal preco, int estoque) {
+        Long id = proximoId.getAndIncrement();
+        Produto produto = new Produto(id, nome, preco, estoque);
+        produtos.put(id, produto);
         return produto;
     }
 
-    @Transactional
-    public void desativar(Long id) {
-        buscarPorId(id).desativar();
+    public void remover(Long id) {
+        if (produtos.remove(id) == null) {
+            throw new ProdutoNaoEncontradoException(id);
+        }
     }
 }

@@ -1,122 +1,52 @@
-# Loja Virtual - servidor HTTP de estudo (Java 25 + Spring Boot 4)
+# Atividade Prática de Servidores — Java + Spring Boot
 
-Projeto da disciplina **Teoria de Servidores**: um servidor HTTP que, ao mesmo tempo,
+**Disciplina:** Programação Web (UNIVALI) · **Grupo:** Yasmin Inturn, Kleyton, Maria Isabel Henke
 
-1. expõe a **API REST** de uma plataforma de e-commerce (catálogo, carrinho, pedidos, pagamento, estoque) e
-2. serve em `GET /` a **própria documentação do trabalho**, lendo o próprio código-fonte em tempo de execução.
+Servidor HTTP em Java com Spring Boot que responde, na rota principal (`/`), a
+documentação pedida pela atividade: pontos fortes da tecnologia, pré-requisitos
+e setup, o próprio código-fonte do servidor e a conclusão do grupo.
 
 ## Como rodar
 
-Só é preciso ter um **JDK 25** instalado. O Maven vem pelo wrapper (`mvnw`), que baixa o próprio Maven na primeira execução.
+Só é preciso ter um **JDK 17+** instalado (o projeto usa Java 25 LTS). O Maven
+vem pelo wrapper (`mvnw`), que baixa o próprio Maven na primeira execução.
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Depois abra <http://localhost:8080> — a documentação do trabalho está lá.
+No Windows (PowerShell/cmd), use `mvnw.cmd` em vez de `./mvnw`. Depois abra
+<http://localhost:8080> — a documentação está lá.
 
-Alternativa empacotada (gera o jar autossuficiente, com o Tomcat dentro):
+Testes: `./mvnw test`
 
-```bash
-./mvnw clean package
-java -jar target/loja-virtual-0.0.1-SNAPSHOT.jar
-```
+> Se você apagar ou renomear algum arquivo em `src/main/java`, rode
+> `./mvnw clean` antes do próximo `run` — sem isso, o arquivo antigo continua
+> aparecendo na Seção 3, porque a cópia do fonte só adiciona, não remove.
 
-No Windows (PowerShell/cmd), use `mvnw.cmd` em vez de `./mvnw`.
+## O que tem no servidor
 
-Testes:
+A rota principal não se limita a um "Hello World": além da página de
+documentação, há uma pequena API REST de exemplo (um catálogo de produtos em
+memória, sem banco de dados) só para provar que o servidor é funcional de
+verdade.
 
-```bash
-./mvnw test
-```
+| Método | Rota                | O que faz                          |
+|--------|---------------------|-------------------------------------|
+| GET    | `/`                 | a documentação da atividade         |
+| GET    | `/api/produtos`     | lista os produtos                   |
+| GET    | `/api/produtos/{id}`| busca um produto (404 se não existe)|
+| POST   | `/api/produtos`     | cria um produto (valida o JSON)     |
+| DELETE | `/api/produtos/{id}`| remove um produto                   |
+| GET    | `/actuator/health`  | health check                        |
 
-## Usuários da carga inicial
-
-O banco é H2 **em memória**: nasce vazio a cada start e é populado por `config/CargaInicial.java`.
-As senhas são de estudo.
-
-| Email              | Senha          | Perfis         |
-|--------------------|----------------|----------------|
-| `admin@loja.com`   | `admin12345`   | ADMIN, CLIENTE |
-| `cliente@loja.com` | `cliente12345` | CLIENTE        |
-
-## Endpoints
-
-Autenticação (JWT no cabeçalho `Authorization: Bearer <token>`):
-
-| Método | Rota                  | Acesso   |
-|--------|-----------------------|----------|
-| POST   | `/api/auth/registrar` | público  |
-| POST   | `/api/auth/login`     | público  |
-| GET    | `/api/auth/eu`        | token    |
-
-Catálogo:
-
-| Método | Rota                        | Acesso  |
-|--------|-----------------------------|---------|
-| GET    | `/api/produtos`             | público |
-| GET    | `/api/produtos/{id}`        | público |
-| GET    | `/api/produtos/sku/{sku}`   | público |
-| POST   | `/api/produtos`             | ADMIN   |
-| PUT    | `/api/produtos/{id}`        | ADMIN   |
-| POST   | `/api/produtos/{id}/estoque`| ADMIN   |
-| DELETE | `/api/produtos/{id}`        | ADMIN   |
-
-Carrinho e pedidos (exigem token):
-
-| Método | Rota                                | Observação                                  |
-|--------|-------------------------------------|---------------------------------------------|
-| GET    | `/api/carrinho`                     | carrinho do usuário do token                |
-| POST   | `/api/carrinho/itens`               | `{"sku":"...","quantidade":1}`              |
-| PUT    | `/api/carrinho/itens/{sku}`         | quantidade 0 remove o item                  |
-| DELETE | `/api/carrinho/itens/{sku}`         |                                             |
-| DELETE | `/api/carrinho`                     | limpa o carrinho                            |
-| GET    | `/api/carrinho/simulacao?cep=&cupom=` | prévia de desconto/frete, sem gravar nada |
-| POST   | `/api/pedidos`                      | checkout com itens no corpo                 |
-| POST   | `/api/pedidos/do-carrinho`          | checkout do carrinho                        |
-| GET    | `/api/pedidos`                      | os meus; ADMIN vê todos                     |
-| GET    | `/api/pedidos/{numero}`             | o dono ou ADMIN                             |
-| PATCH  | `/api/pedidos/{numero}/status`      | ADMIN move o fluxo                          |
-| POST   | `/api/pedidos/{numero}/cancelamento`| dono ou ADMIN, antes do envio               |
-
-Apoio: `/doc/rotas`, `/doc/arquivos`, `/doc/fonte/{caminho}`, `/actuator/health`, `/actuator/metrics`, `/h2-console`.
-
-## Regras de negócio implementadas
-
-- **Frete** (`frete/FreteService`): taxa por região derivada do CEP + peso × custo por kg + manuseio;
-  grátis acima de R$ 299 ou com cupom `FRETEGRATIS`; prazo varia por região.
-- **Descontos** (`desconto/DescontoService`): cupons `PRIMEIRACOMPRA` (10%, teto R$ 50),
-  `BLACK20` (20%, teto R$ 200), `FRETEGRATIS`; desconto progressivo por volume
-  (5 itens → 3%, 10 → 5%, 20 → 8%); acumulado limitado a 25% do subtotal.
-- **Estoque** (`estoque/EstoqueService`): só funciona dentro de transação (`Propagation.MANDATORY`);
-  falta de estoque devolve **409** com SKU, solicitado e disponível.
-- **Fluxo de status** (`pedido/StatusPedido`): transições válidas declaradas no enum;
-  cancelar antes do envio devolve o estoque.
-- **Pagamento simulado** (`pagamento/PagamentoService`): PIX autoriza na hora, boleto fica pendente,
-  cartão terminado em `0000` é **recusado** — e a recusa derruba a transação inteira.
-
-## O ponto central: atomicidade do checkout
-
-`PedidoService.criar` roda em um único `@Transactional` e faz, nesta ordem:
-baixa de estoque → desconto → frete → pagamento → gravação do pedido.
-Se o pagamento for recusado, a exceção sobe e o rollback desfaz a baixa de estoque.
-Não existe código de compensação escrito à mão.
-
-Para ver isso acontecer:
+Exemplo:
 
 ```bash
-TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+curl http://localhost:8080/api/produtos
+curl -X POST http://localhost:8080/api/produtos \
   -H 'Content-Type: application/json' \
-  -d '{"email":"cliente@loja.com","senha":"cliente12345"}' | sed -E 's/.*"token":"([^"]+)".*/\1/')
-
-curl -s http://localhost:8080/api/produtos | grep -o '"sku":"SSD-1TB-NV","[^}]*'   # estoque antes
-
-curl -s -X POST http://localhost:8080/api/pedidos \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
-  -d '{"itens":[{"sku":"SSD-1TB-NV","quantidade":1}],"cepEntrega":"69900-000",
-       "metodoPagamento":"CARTAO_CREDITO","numeroCartao":"4111111111110000"}'
-
-curl -s http://localhost:8080/api/produtos | grep -o '"sku":"SSD-1TB-NV","[^}]*'   # estoque depois: igual
+  -d '{"nome":"Webcam","preco":199.90,"estoque":3}'
 ```
 
 ## Estrutura
@@ -124,33 +54,15 @@ curl -s http://localhost:8080/api/produtos | grep -o '"sku":"SSD-1TB-NV","[^}]*'
 ```
 src/main/java/br/com/loja/
 ├── LojaVirtualApplication.java   main() que sobe o Tomcat embarcado
-├── auth/        usuários, perfis, login, emissão de JWT
-├── carrinho/    carrinho persistido por usuário
-├── catalogo/    produto, repositório, serviço e controller
-├── common/      exceções de domínio e tradução para HTTP (ProblemDetail)
-├── config/      Spring Security e carga inicial de dados
-├── desconto/    regras de cupom e desconto por volume
-├── doc/         a página de documentação e a leitura do próprio código
-├── estoque/     validação e baixa de estoque
-├── frete/       cálculo de frete por região e peso
-├── pagamento/   gateway simulado
-└── pedido/      checkout transacional e fluxo de status
+├── catalogo/   a API de exemplo (Produto, Service, Controller em memória)
+└── doc/        a página de documentação e a leitura do próprio código
 ```
 
-A documentação em `GET /` é renderizada por `templates/documentacao.html` (Thymeleaf) com:
-
-- texto editorial vindo de `application.yml` (seção `documentacao:` — é lá que se editam
-  participantes, pontos fortes e conclusão);
-- rotas lidas do `RequestMappingHandlerMapping` em tempo de execução;
-- código-fonte lido do classpath: o `maven-resources-plugin` copia `src/main/java` para
-  `target/classes/fonte` durante o build, então a página mostra o fonte real mesmo rodando como `java -jar`.
-
-## Configuração relevante (`application.yml`)
-
-| Chave | Para quê |
-|-------|----------|
-| `loja.frete.*` | parâmetros do cálculo de frete |
-| `loja.seguranca.jwt-segredo` | chave HMAC do JWT (em produção, variável de ambiente `LOJA_SEGURANCA_JWT_SEGREDO`) |
-| `loja.seguranca.expiracao-minutos` | validade do token |
-| `documentacao.*` | todo o conteúdo da página servida em `/` |
-| `spring.jpa.show-sql` | `true` mostra no console o SQL de cada pedido |
+A página em `GET /` é renderizada por `templates/documentacao.html`
+(Thymeleaf). Todo o texto editorial (pontos fortes, caso de uso, setup,
+conclusão) vem de `application.yml`, seção `documentacao:` — editar o texto
+não exige recompilar nem mexer no HTML. O código-fonte mostrado na página é
+lido do próprio classpath em tempo de execução (`CodigoFonteService`), e a
+tabela de rotas é lida do `RequestMappingHandlerMapping` do Spring MVC — nada
+disso é copiado à mão, então a página nunca fica desatualizada em relação ao
+código.

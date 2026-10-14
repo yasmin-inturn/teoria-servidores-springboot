@@ -1,163 +1,123 @@
 spring:
   application:
     name: loja-virtual
-
-  # Banco em memoria: nasce vazio a cada start e e populado pelo CargaInicial.
-  # Trocar para PostgreSQL seria mudar estas 4 linhas + a dependencia no pom.
-  datasource:
-    url: jdbc:h2:mem:loja;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-
-  jpa:
-    hibernate:
-      ddl-auto: create-drop   # o Hibernate cria as tabelas a partir das @Entity
-    open-in-view: false       # evita consulta preguicosa durante a renderizacao
-    show-sql: false           # mude para true e veja o SQL de cada pedido no console
-    properties:
-      hibernate.format_sql: true
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console       # inspecione as tabelas pelo navegador em dev
-
   thymeleaf:
     cache: false
 
 server:
   port: 8080
-  error:
-    include-message: always
 
-# Endpoints de operacao: saude para o orquestrador, metricas para o time.
+# Health check para provar, ao vivo, um dos pontos fortes citados na pagina.
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,beans,mappings,env,loggers
-  endpoint:
-    health:
-      show-details: when-authorized
-  info:
-    env:
-      enabled: true
+        include: health,info
 
 info:
   app:
-    nome: Loja Virtual - servidor de estudo
-    descricao: API REST de e-commerce com Spring Boot
-
-loja:
-  frete:
-    valor-minimo-frete-gratis: 299.00
-    custo-por-kg: 2.50
-    taxa-manuseio: 4.90
-    prazo-base-dias: 3
-  seguranca:
-    # Em producao isto vem de variavel de ambiente (LOJA_SEGURANCA_JWT_SEGREDO).
-    jwt-segredo: "troque-este-segredo-de-estudo-por-32-bytes-ou-mais-em-producao"
-    expiracao-minutos: 120
-    emissor: loja-virtual
-
-logging:
-  level:
-    br.com.loja: INFO
+    nome: Atividade de Servidores - Java + Spring Boot
 
 # ---------------------------------------------------------------------------
-# Conteudo da pagina de documentacao servida em GET /
-# Edite daqui para baixo: nomes do grupo, pontos fortes e conclusao.
+# Conteudo da pagina de documentacao servida em GET /.
+# Editar daqui para baixo nao exige recompilar nem mexer no HTML.
 # ---------------------------------------------------------------------------
 documentacao:
-  titulo: "Java 25 + Spring Boot 4"
-  tecnologia: "Java 25 (LTS) com Spring Boot 4.0 e Tomcat embarcado"
-  subtitulo: "Servidor HTTP de uma plataforma de e-commerce: API REST, transacoes e seguranca"
-  disciplina: "Teoria de Servidores"
-  instituicao: "[Instituicao]"
+  titulo: "Java + Spring Boot"
+  disciplina: "Programacao Web - Atividade Pratica: Servidores"
+  instituicao: "UNIVALI"
   comando-execucao: "./mvnw spring-boot:run"
-  comando-alternativo: "./mvnw clean package && java -jar target/loja-virtual-0.0.1-SNAPSHOT.jar"
 
   participantes:
     - nome: "Yasmin Inturn"
-      papel: "Catalogo, estoque e documentacao"
     - nome: "Kleyton"
-      papel: "Pedidos e pagamento"
     - nome: "Maria Isabel Henke"
-      papel: "Seguranca e JWT"
 
   pontos-fortes:
-    - titulo: "Tipagem forte e injecao de dependencias"
+    - titulo: "Tipagem forte"
       texto: >
-        O compilador cobra o contrato antes de o servidor subir: um DTO que mudou
-        de campo quebra o build, nao a requisicao do cliente. Com injecao por
-        construtor, cada classe declara do que precisa e nada mais - o que torna
-        o servico testavel sem subir o Tomcat, passando dublês no construtor.
-        Dinheiro so circula como BigDecimal, nunca double.
+        O compilador cobra o contrato antes de o servidor subir: um campo com o tipo errado
+        quebra o build, nao a requisicao do cliente. Isso evita uma classe inteira de bugs
+        que em linguagens dinamicas so aparecem em tempo de execucao.
 
-    - titulo: "Servidor embarcado e auto-configuracao"
+    - titulo: "Injecao de dependencias"
       texto: >
-        Nao existe servidor de aplicacao para instalar: o Tomcat vem dentro do
-        jar e o metodo main() e o servidor. A auto-configuracao do Spring Boot
-        olha o classpath e liga o que esta la (Tomcat, JPA, Jackson, Security,
-        Actuator) com padroes sensatos - sem XML, e com a opcao de sobrescrever
-        qualquer peca quando a convencao nao serve.
+        Cada classe declara do que precisa no construtor (@Service, @RestController) e o
+        Spring monta o grafo de objetos sozinho. O resultado e codigo desacoplado e facil de
+        testar, sem new() espalhado pela aplicacao.
 
-    - titulo: "Transacoes declarativas: atomicidade sem codigo de controle"
+    - titulo: "Servidor embarcado"
       texto: >
-        Finalizar um pedido baixa estoque, registra pagamento e grava o pedido.
-        Um unico @Transactional no PedidoService garante que isso seja tudo ou
-        nada: se o pagamento for recusado, a excecao sobe e o rollback desfaz a
-        baixa de estoque. Nao existe codigo de compensacao escrito a mao, nem
-        begin/commit espalhado pela aplicacao.
+        Nao existe servidor de aplicacao para instalar a parte: o Tomcat vem dentro do jar e
+        o metodo main() e o proprio servidor. "java -jar" sobe tudo.
 
-    - titulo: "Seguranca antes do controller"
+    - titulo: "Auto-configuracao"
       texto: >
-        O Spring Security roda como uma cadeia de filtros na frente do
-        DispatcherServlet. O JWT e validado antes de qualquer regra de negocio e
-        rotas protegidas nunca chegam ao @RestController sem autenticacao. Como o
-        token carrega os perfis, a API fica stateless - da para subir varias
-        instancias atras de um balanceador sem sessao compartilhada.
+        O Spring Boot olha o que esta no classpath (Tomcat, Jackson, Thymeleaf, Actuator) e
+        liga cada peca com um padrao sensato - sem XML, com a opcao de sobrescrever qualquer
+        parte quando a convencao nao serve.
 
-    - titulo: "Pronto para operar, nao so para rodar"
+    - titulo: "Ecossistema maduro"
       texto: >
-        O Actuator expoe /actuator/health (liveness e readiness para Docker e
-        Kubernetes) e /actuator/metrics com dados reais de JVM, pool de conexoes
-        e requisicoes HTTP. A mesma aplicacao que roda na aula tem os ganchos que
-        um ambiente de producao exige para monitorar e escalar.
+        Validacao de dados (Bean Validation), serializacao JSON (Jackson) e metricas
+        (Actuator) ja vem prontos e testados em producao por milhares de empresas - nao
+        precisa escrever nem escolher essas pecas do zero.
+
+  caso-de-uso-ideal: >
+    Uma plataforma de e-commerce com API REST ilustra bem onde o Spring Boot brilha: catalogo
+    de produtos, carrinho, pedidos, pagamentos e estoque, com regras de negocio como calculo
+    de frete, descontos e validacao de estoque. A tipagem forte do Java e a injecao de
+    dependencias do Spring ajudam a manter esse tipo de codigo organizado e testavel, e
+    bibliotecas como Spring Security (login e perfis) e Spring Data JPA (persistencia) cobrem
+    o resto sem reinventar nada. Esse mesmo framework nao compensa para uma landing page
+    simples ou um script pequeno: o custo de configuracao inicial e o consumo de memoria do
+    Tomcat embarcado so se pagam quando a aplicacao cresce.
+
+  prerequisitos:
+    - "JDK 17 ou superior (este projeto usa o Java 25 LTS)"
+    - "Maven 3.6.3+ (ou o wrapper ./mvnw, que baixa o Maven sozinho)"
+    - "Uma IDE com suporte a Maven - usamos o IntelliJ IDEA"
+
+  # Passos iguais nos tres sistemas, antes de abrir o terminal.
+  setup-comum:
+    - "Instalar um JDK 17+ (ex.: Eclipse Temurin ou Microsoft Build of OpenJDK)"
+    - "Gerar o esqueleto do projeto em https://start.spring.io (Spring Initializr)"
+    - "Extrair o .zip e abrir a pasta com o pom.xml no IntelliJ IDEA -> 'Trust Project'"
+
+  # Daqui pra baixo e so o que muda de um sistema operacional para o outro:
+  # como confirmar o JDK instalado, como configurar o JAVA_HOME e qual script
+  # do wrapper rodar (mvnw no Linux/macOS, mvnw.cmd no Windows).
+  setup-linux:
+    - "java -version && javac -version"
+    - "export JAVA_HOME=/usr/lib/jvm/java-25-openjdk   # ajuste para o caminho da sua distro"
+    - "export PATH=$JAVA_HOME/bin:$PATH"
+    - "chmod +x mvnw                 # garante que o wrapper pode ser executado"
+    - "./mvnw spring-boot:run        # baixa as dependencias e sobe o servidor"
+    - "# abrir http://localhost:8080 no navegador"
+
+  setup-macos:
+    - "java -version && javac -version"
+    - "export JAVA_HOME=$(/usr/libexec/java_home -v 25)"
+    - "export PATH=$JAVA_HOME/bin:$PATH"
+    - "./mvnw spring-boot:run        # baixa as dependencias e sobe o servidor"
+    - "# abrir http://localhost:8080 no navegador"
+
+  setup-windows:
+    - "java -version"
+    - "javac -version"
+    - ":: Painel de Controle > Variaveis de Ambiente > Novo: JAVA_HOME = C:\\Program Files\\...\\jdk-25"
+    - ":: Editar a variavel Path e adicionar %JAVA_HOME%\\bin"
+    - "mvnw.cmd spring-boot:run       # baixa as dependencias e sobe o servidor"
+    - ":: abrir http://localhost:8080 no navegador"
 
   conclusao:
     dificuldade: >
-      A maior dificuldade inicial nao foi escrever codigo, foi entender o que o
-      framework faz sozinho. Muita coisa acontece por convencao e fica invisivel:
-      quem criou o Tomcat, quem abriu a transacao, por que uma anotacao as vezes
-      simplesmente nao tem efeito. O caso que mais nos custou foi descobrir que
-      @Transactional (e @PreAuthorize) funcionam por PROXY - chamar um metodo
-      anotado de dentro da propria classe nao passa pelo proxy e a anotacao e
-      ignorada em silencio, sem erro nenhum.
-    como-resolvemos: >
-      Passamos a tratar o framework como algo inspecionavel, nao magico: lemos o
-      log de inicializacao, usamos /actuator/beans e /actuator/mappings para ver
-      o que o servidor realmente registrou e ligamos spring.jpa.show-sql para
-      acompanhar o SQL de cada pedido. Esta propria pagina nasceu dai: as rotas
-      que ela lista sao lidas do RequestMappingHandlerMapping em tempo de
-      execucao, entao e o servidor descrevendo a si mesmo.
+      A maior dificuldade inicial foi entender o que o framework faz sozinho. Muita coisa
+      acontece por convencao e fica invisivel para quem esta comecando: quem criou o Tomcat,
+      de onde vem a validacao automatica do JSON, por que um bean "simplesmente funciona" sem
+      ninguem ter instanciado ele em lugar nenhum.
     recomendacao: >
-      Para quem for comecar: suba um monolito organizado por dominio (catalogo,
-      carrinho, pedido, pagamento) antes de pensar em microsservicos - a divisao
-      em servicos independentes fica facil depois que as fronteiras ja estao
-      claras no codigo, e evita pagar o custo de rede e de consistencia
-      distribuida sem precisar. E invista cedo em entender a cadeia de filtros, o
-      proxy transacional e o ciclo de vida dos beans: e o que separa usar o
-      Spring de depender da sorte.
-
-  # Arquivos exibidos por inteiro na secao "O codigo do servidor".
-  arquivos-destaque:
-    - "java/br/com/loja/LojaVirtualApplication.java"
-    - "java/br/com/loja/pedido/PedidoService.java"
-    - "java/br/com/loja/pedido/PedidoController.java"
-    - "java/br/com/loja/config/SecurityConfig.java"
-    - "java/br/com/loja/doc/DocumentacaoController.java"
-    - "java/br/com/loja/doc/CodigoFonteService.java"
-    - "resources/application.yml"
-    - "pom.xml"
+      Comecar pelo Spring Initializr com poucas dependencias (so Web e Thymeleaf, por
+      exemplo) e ir adicionando uma de cada vez, olhando o log de inicializacao a cada passo.
+      Isso torna visivel o que cada starter liga sozinho, em vez de herdar um projeto grande
+      e tentar entender tudo de uma vez.

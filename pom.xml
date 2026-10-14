@@ -2,10 +2,10 @@
 <!--
   Build do projeto.
 
-  O spring-boot-starter-parent traz o "dependency management": as versoes de
-  centenas de bibliotecas ja vem combinadas entre si, por isso nenhuma
-  dependencia abaixo declara <version>. O spring-boot-maven-plugin empacota
-  tudo (classes + dependencias + Tomcat) em um jar executavel.
+  O spring-boot-starter-parent traz o "dependency management": as versões de
+  centenas de bibliotecas já vêm combinadas entre si, por isso nenhuma
+  dependência abaixo declara <version>. O spring-boot-maven-plugin empacota
+  tudo (classes + dependências + Tomcat) em um jar executável.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -22,7 +22,7 @@
 	<artifactId>loja-virtual</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>loja-virtual</name>
-	<description>Servidor HTTP de estudo - plataforma de e-commerce com API REST em Spring Boot</description>
+	<description>Atividade pratica de servidores: Java + Spring Boot</description>
 
 	<properties>
 		<java.version>25</java.version>
@@ -41,79 +41,23 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- JPA/Hibernate + gerenciamento de transacoes. -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<!-- Cadeia de filtros de seguranca e validacao de JWT (resource server). -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
-		</dependency>
-
 		<!-- Thymeleaf: renderiza a pagina de documentacao servida em GET /. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
-		<!-- Health checks e metricas (/actuator). -->
+		<!-- Health check (/actuator/health): prova de que o Spring Boot ja vem
+		     com ganchos de operacao, sem escrever nenhum codigo para isso. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-		<!-- Banco em memoria + console web para inspecionar as tabelas em dev. -->
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-h2console</artifactId>
-		</dependency>
-
-		<!-- Testes: JUnit 5, MockMvc, utilitarios de seguranca e de JPA. -->
+		<!-- Testes: JUnit 5 e MockMvc. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security-oauth2-resource-server-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -130,7 +74,6 @@
 			  target/classes/fonte. E isso que permite a pagina de documentacao
 			  exibir o codigo do servidor que a esta servindo, inclusive quando
 			  roda como "java -jar" numa maquina sem a pasta do projeto.
-			  Sem <filtering>, nada de ${...} no codigo e substituido.
 			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -150,18 +93,9 @@
 									<targetPath>java</targetPath>
 								</resource>
 								<resource>
-									<directory>src/main/resources</directory>
-									<targetPath>resources</targetPath>
-								</resource>
-								<resource>
-									<directory>src/test/java</directory>
-									<targetPath>teste</targetPath>
-								</resource>
-								<resource>
 									<directory>${project.basedir}</directory>
 									<includes>
 										<include>pom.xml</include>
-										<include>README.md</include>
 									</includes>
 								</resource>
 							</resources>

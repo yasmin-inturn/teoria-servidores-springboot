@@ -5,30 +5,48 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Todo o conteudo editorial da pagina de documentacao vem do application.yml
- * (prefixo documentacao). Trocar os nomes do grupo, os pontos fortes ou o texto
- * da conclusao nao exige mexer em Java nem em HTML.
+ * Todo o conteúdo editorial da página de documentação vem do application.yml
+ * (prefixo documentacao). Trocar um texto não exige mexer em Java nem em HTML.
+ *
+ * A estrutura dos campos segue à risca o que a atividade pede: título,
+ * pontos fortes + caso de uso ideal, pré-requisitos e setup, e conclusão.
  */
 @ConfigurationProperties(prefix = "documentacao")
 public record DocumentacaoProperties(
         String titulo,
-        String tecnologia,
-        String subtitulo,
         String disciplina,
         String instituicao,
         String comandoExecucao,
-        String comandoAlternativo,
         List<Participante> participantes,
         List<PontoForte> pontosFortes,
-        Conclusao conclusao,
-        List<String> arquivosDestaque) {
+        String casoDeUsoIdeal,
+        List<String> prerequisitos,
+        List<String> setupComum,
+        List<String> setupLinux,
+        List<String> setupMacos,
+        List<String> setupWindows,
+        Conclusao conclusao) {
 
-    public record Participante(String nome, String papel) {
+    // Thymeleaf bloqueia acesso a java.lang.System (T(...)) dentro do template,
+    // entao o join de cada bloco de comandos e feito aqui, em Java puro.
+    public String setupLinuxTexto() {
+        return String.join("\n", setupLinux());
+    }
+
+    public String setupMacosTexto() {
+        return String.join("\n", setupMacos());
+    }
+
+    public String setupWindowsTexto() {
+        return String.join("\n", setupWindows());
+    }
+
+    public record Participante(String nome) {
     }
 
     public record PontoForte(String titulo, String texto) {
     }
 
-    public record Conclusao(String dificuldade, String comoResolvemos, String recomendacao) {
+    public record Conclusao(String dificuldade, String recomendacao) {
     }
 }

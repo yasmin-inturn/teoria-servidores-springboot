@@ -15,8 +15,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
  *
  * O @SpringBootApplication e a soma de tres anotacoes:
  *   @Configuration        - esta classe pode declarar beans;
- *   @EnableAutoConfiguration - liga o que estiver no classpath (Tomcat, JPA,
- *                              Jackson, Security, Actuator) com padroes sensatos;
+ *   @EnableAutoConfiguration - liga o que estiver no classpath (Tomcat, Jackson,
+ *                              Thymeleaf, Actuator) com padroes sensatos;
  *   @ComponentScan        - procura componentes a partir deste pacote.
  *
  * Comando para rodar: ./mvnw spring-boot:run   (depois abra http://localhost:8080)

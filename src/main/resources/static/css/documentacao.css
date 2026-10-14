@@ -140,25 +140,8 @@ h1 {
     border-radius: 10px;
     background: var(--fundo-cartao);
     box-shadow: var(--sombra);
-}
-
-.participante strong {
-    display: block;
-    font-size: .96rem;
-}
-
-.participante span {
-    color: var(--texto-suave);
-    font-size: .8rem;
-}
-
-.meta-capa {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 20px;
-    margin-top: 22px;
-    color: var(--texto-suave);
-    font-size: .88rem;
+    font-size: .92rem;
+    font-weight: 600;
 }
 
 /* ---------- barra de status do servidor ---------- */
@@ -218,7 +201,8 @@ h2 {
     letter-spacing: -.01em;
 }
 
-.intro-secao {
+.intro-secao,
+.texto-corrido {
     margin: 0 0 24px;
     max-width: 72ch;
     color: var(--texto-suave);
@@ -227,6 +211,16 @@ h2 {
 h3 {
     margin: 32px 0 10px;
     font-size: 1.1rem;
+}
+
+.lista-simples {
+    margin: 0 0 24px;
+    padding-left: 20px;
+    color: var(--texto-suave);
+}
+
+.lista-simples li {
+    margin-bottom: 6px;
 }
 
 /* ---------- pontos fortes ---------- */
@@ -264,63 +258,6 @@ h3 {
     margin: 0;
     color: var(--texto-suave);
     font-size: .95rem;
-}
-
-/* ---------- fluxo da requisicao ---------- */
-
-.fluxo {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: etapa;
-}
-
-.fluxo li {
-    position: relative;
-    padding: 0 0 20px 42px;
-    counter-increment: etapa;
-}
-
-.fluxo li::before {
-    content: counter(etapa);
-    position: absolute;
-    left: 0;
-    top: 0;
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--borda-forte);
-    border-radius: 50%;
-    background: var(--fundo-cartao);
-    color: var(--acento);
-    font-family: var(--mono);
-    font-size: .82rem;
-}
-
-.fluxo li:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    left: 13.5px;
-    top: 30px;
-    bottom: 2px;
-    width: 1px;
-    background: var(--borda);
-}
-
-.fluxo strong {
-    display: block;
-    font-size: .98rem;
-}
-
-.fluxo code {
-    font-size: .86rem;
-}
-
-.fluxo p {
-    margin: 2px 0 0;
-    color: var(--texto-suave);
-    font-size: .93rem;
 }
 
 /* ---------- tabelas ---------- */
@@ -482,48 +419,6 @@ details.arquivo > summary::before {
 
 details.arquivo[open] > summary::before {
     content: "▾ ";
-}
-
-/* ---------- arvore de arquivos ---------- */
-
-.pasta {
-    margin-bottom: 10px;
-    border: 1px solid var(--borda);
-    border-radius: var(--raio);
-    background: var(--fundo-cartao);
-    overflow: hidden;
-}
-
-.pasta > summary {
-    cursor: pointer;
-    padding: 10px 14px;
-    background: var(--fundo-sutil);
-    font-family: var(--mono);
-    font-size: .84rem;
-}
-
-.pasta ul {
-    margin: 0;
-    padding: 8px 14px 12px 30px;
-}
-
-.pasta li {
-    font-family: var(--mono);
-    font-size: .84rem;
-}
-
-.pasta a {
-    color: var(--acento-forte);
-    text-decoration: none;
-}
-
-.pasta a:hover {
-    text-decoration: underline;
-}
-
-.pasta .linhas {
-    color: var(--texto-suave);
-    font-size: .76rem;
 }
 
 /* ---------- conclusao ---------- */
