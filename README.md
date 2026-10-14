@@ -1,6 +1,6 @@
 # Loja Virtual - servidor HTTP de estudo (Java 25 + Spring Boot 4)
 
-Projeto da disciplina **Teoria de Servidores**: um servidor HTTP que, ao mesmo tempo,
+Projeto da disciplina **Programação web**: um servidor HTTP que, ao mesmo tempo,
 
 1. expõe a **API REST** de uma plataforma de e-commerce (catálogo, carrinho, pedidos, pagamento, estoque) e
 2. serve em `GET /` a **própria documentação do trabalho**, lendo o próprio código-fonte em tempo de execução.
