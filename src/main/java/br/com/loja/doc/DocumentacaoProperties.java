@@ -47,6 +47,6 @@ public record DocumentacaoProperties(
     public record PontoForte(String titulo, String texto) {
     }
 
-    public record Conclusao(String dificuldade, String recomendacao) {
+    public record Conclusao(String dificuldade, String recomendacao, String referencia) {
     }
 }

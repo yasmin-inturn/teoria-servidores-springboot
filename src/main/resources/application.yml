@@ -120,4 +120,12 @@ documentacao:
       Comecar pelo Spring Initializr com poucas dependencias (so Web e Thymeleaf, por
       exemplo) e ir adicionando uma de cada vez, olhando o log de inicializacao a cada passo.
       Isso torna visivel o que cada starter liga sozinho, em vez de herdar um projeto grande
-      e tentar entender tudo de uma vez.
+      e tentar entender tudo de uma vez. Dois proximos passos uteis: o Swagger gera a
+      documentacao dos endpoints sozinho (normalmente em /swagger-ui.html, lendo as
+      anotacoes dos controllers) e o Insomnia (ou Postman) testa a API sem precisar escrever
+      cada requisicao na mao no curl.
+    referencia: >
+      Alem do material da disciplina, o grupo usou como apoio o video "Curso Spring Boot:
+      Criando sua primeira API REST do ZERO - Parte 1" (canal Souza DEV), que ajudou a
+      entender na pratica o fluxo controller -> service -> repository e o Global Exception
+      Handler que inspirou o nosso ApiExceptionHandler.
